@@ -1,4 +1,4 @@
-@version = "1.0.0"
+@version = "1.0.2"
 
 Pod::Spec.new do |s|
   s.name         		= "J2ObjC-Framework"
@@ -16,10 +16,12 @@ Pod::Spec.new do |s|
   s.libraries       = 'icucore', 'z'
 
   s.prepare_command = <<-CMD
-      Scripts/download.sh
+      Scripts/download.sh #{@version} 6f2f45b323ef92cc8d1b13dd789aebd1ab87562f
   CMD
 
-  s.preserve_paths = ['Frameworks/j2objc.framework', 'Distributive', 'install.sh']
-  s.xcconfig = { 'FRAMEWORK_SEARCH_PATHS' => '"$(PODS_ROOT)/J2ObjC-Framework/Frameworks"' }  
-  
+  s.preserve_paths = 'Frameworks/j2objc.framework', 'dist', 'install.sh'
+  s.pod_target_xcconfig = {
+    'FRAMEWORK_SEARCH_PATHS' => '"$(PODS_ROOT)/J2ObjC-Framework/Frameworks"'
+  }
+
 end

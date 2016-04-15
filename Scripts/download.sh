@@ -1,18 +1,30 @@
 #!/bin/bash
-set -ev
+set -e
 
-j2objc_version=1.0.0
-sha1_checksum=703d2a8d132f828a9dece35a0efc7cbdcef83e29
+if [ $# -ne 2 ]; then
+  echo "usage: download.sh <version-number> <sha1_checksum>"
+  exit 1
+fi
 
-echo "fetching j2objc dist"
-curl -OL https://github.com/google/j2objc/releases/download/${j2objc_version}/j2objc-${j2objc_version}.zip
-echo "${sha1_checksum}  j2objc-${j2objc_version}.zip" | shasum -c
-unzip -o -q j2objc-${j2objc_version}.zip
-mv j2objc-${j2objc_version} Distributive
-rm j2objc-${j2objc_version}.zip
+j2objc_version=$1
+sha1_checksum=$2
+dist_path="dist"
+
+if [[ -d ${dist_path} ]] && [ "$j2objc_version" == $(${dist_path}/j2objc -version 2>&1 | cut -d' ' -f2) ]; then
+  echo "$(${dist_path}/j2objc -version 2>&1) is already downloaded. Recreating Framework..."
+else
+  echo "fetching j2objc dist"
+  curl -OL https://github.com/google/j2objc/releases/download/${j2objc_version}/j2objc-${j2objc_version}.zip
+  echo "${sha1_checksum}  j2objc-${j2objc_version}.zip" | shasum -c
+  unzip -o -q j2objc-${j2objc_version}.zip
+  mv j2objc-${j2objc_version} ${dist_path}
+  rm j2objc-${j2objc_version}.zip
+fi
+
+framework_name="j2objc"
+framework_path="Frameworks/${framework_name}.framework/"
 
 echo "Creating framework"
-mkdir Frameworks
-mkdir Frameworks/j2objc.framework
-cp -a Scripts/Template/* Frameworks/j2objc.framework/
-cp Distributive/lib/libjre_emul.a Frameworks/j2objc.framework/j2objc
+mkdir -p ${framework_path}
+cp -a ${dist_path}/include/* "${framework_path}"
+cp ${dist_path}/lib/libjre_emul.a "${framework_path}/${framework_name}"
