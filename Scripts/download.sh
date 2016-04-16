@@ -26,5 +26,6 @@ framework_path="Frameworks/${framework_name}.framework/"
 
 echo "Creating framework"
 mkdir -p ${framework_path}
-cp -a ${dist_path}/include/* "${framework_path}"
+cp -a Scripts/Template/* "${framework_path}"
+cp -a ${dist_path}/include/* "${framework_path}/Headers"
 cp ${dist_path}/lib/libjre_emul.a "${framework_path}/${framework_name}"
